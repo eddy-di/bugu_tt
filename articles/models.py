@@ -5,15 +5,15 @@ from accounts.models import User
 
 
 class Article(models.Model):
-    DRAFT = 'DRAFT'
-    PUBLISHED = 'PUBLISHED'
+    PRIVATE = 'PRIVATE'
+    PUBLIC = 'PUBLIC'
 
-    STATUS_CHOICES = [
-        (DRAFT, 'Draft'),
-        (PUBLISHED, 'Published'),
+    VISIBILITY_CHOICES = [
+        (PRIVATE, 'Private type article'),
+        (PUBLIC, 'Public type article'),
     ]
 
-    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default=DRAFT)
+    visibility = models.CharField(max_length=7, choices=VISIBILITY_CHOICES, default=PUBLIC)
     title = models.CharField(max_length=200)
     description = models.TextField()
     content = models.TextField()

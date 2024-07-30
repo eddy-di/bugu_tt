@@ -1,0 +1,391 @@
+openapi: 3.0.3
+info:
+  title: BuguShop Test Task Project API
+  version: 0.1.0
+  description: This API is to fulfill requirements for BuguShops task for position
+    of intern.
+paths:
+  /accounts/login:
+    post:
+      operationId: accounts_login_create
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /accounts/logout:
+    post:
+      operationId: accounts_logout_create
+      tags:
+      - accounts
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Logout'
+          description: ''
+  /accounts/register:
+    post:
+      operationId: accounts_register_create
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+          description: ''
+  /articles/private:
+    get:
+      operationId: articles_private_list
+      tags:
+      - articles
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrivateArticleList'
+          description: ''
+    post:
+      operationId: articles_private_create
+      tags:
+      - articles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivateArticleDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PrivateArticleDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PrivateArticleDetail'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateArticleDetail'
+          description: ''
+  /articles/private/{id}:
+    get:
+      operationId: articles_private_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - articles
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateArticleDetail'
+          description: ''
+    put:
+      operationId: articles_private_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - articles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivateArticleDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PrivateArticleDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PrivateArticleDetail'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateArticleDetail'
+          description: ''
+    patch:
+      operationId: articles_private_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - articles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPrivateArticleDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPrivateArticleDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPrivateArticleDetail'
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateArticleDetail'
+          description: ''
+    delete:
+      operationId: articles_private_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - articles
+      security:
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /articles/public:
+    get:
+      operationId: articles_public_list
+      tags:
+      - articles
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicArticleList'
+          description: ''
+  /articles/public/{id}:
+    get:
+      operationId: articles_public_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - articles
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicArticleDetail'
+          description: ''
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    Logout:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    PatchedPrivateArticleDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        visibility:
+          $ref: '#/components/schemas/VisibilityEnum'
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        content:
+          type: string
+    PrivateArticleDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        visibility:
+          $ref: '#/components/schemas/VisibilityEnum'
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        content:
+          type: string
+      required:
+      - content
+      - description
+      - id
+      - title
+    PrivateArticleList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        visibility:
+          $ref: '#/components/schemas/VisibilityEnum'
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+      required:
+      - description
+      - id
+      - title
+    PublicArticleDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        content:
+          type: string
+        author:
+          type: integer
+      required:
+      - author
+      - content
+      - description
+      - id
+      - title
+    PublicArticleList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        author:
+          type: integer
+      required:
+      - author
+      - description
+      - id
+      - title
+    Register:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          pattern: ^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - email
+      - password
+    VisibilityEnum:
+      enum:
+      - PRIVATE
+      - PUBLIC
+      type: string
+      description: |-
+        * `PRIVATE` - Private type article
+        * `PUBLIC` - Public type article
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
