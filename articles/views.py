@@ -5,34 +5,25 @@ from rest_framework.exceptions import PermissionDenied
 from accounts.models import User
 from articles.models import Article
 from articles.serializers import (
-    PublicArticleListSerializer,
-    PublicArticleDetailSerializer,
-    PrivateArticleListSerializer,
-    PrivateArticleDetailSerializer
+    ArticleListSerializer,
+    ArticleDetailSerializer
 )
 
 
-class PublicListView(ListAPIView):
-    queryset = Article.objects.filter(visibility=Article.PUBLIC).all()
-    serializer_class = PublicArticleListSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-class PublicDetailView(RetrieveAPIView):
-    queryset = Article.objects.filter(visibility=Article.PUBLIC)
-    serializer_class = PublicArticleDetailSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-class PrivateListCreateView(ListCreateAPIView):
-    queryset = Article.objects.filter(visibility=Article.PRIVATE).all()
-    permission_classes = [permissions.IsAuthenticated]
+class ArticleListCreateView(ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
-            return PrivateArticleDetailSerializer
-        return PrivateArticleListSerializer
+            return ArticleDetailSerializer
+        return ArticleListSerializer
     
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return Article.objects.all()
+        else:
+            return Article.objects.filter(visibility=Article.PUBLIC)
+
     def post(self, request, *args, **kwargs):
         if request.user.role != User.AUTHOR:
             raise PermissionDenied(
@@ -44,10 +35,21 @@ class PrivateListCreateView(ListCreateAPIView):
         return result
     
 
-class PrivateDetailView(RetrieveUpdateDestroyAPIView):
+class ArticleDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = PrivateArticleDetailSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = ArticleDetailSerializer
+
+    def get_object(self):
+        obj = super().get_object()
+        if not self.request.user.is_authenticated:
+            if obj.visibility == Article.PUBLIC:
+                return obj
+            raise PermissionDenied(
+                {'detail': 'You are not allowed to access this article.'},
+                code=status.HTTP_403_FORBIDDEN
+            )
+        return obj
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

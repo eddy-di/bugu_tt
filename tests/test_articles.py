@@ -15,7 +15,7 @@ def test_get_list_public_articles_as_anon(
     # given: anon user and num of public articles
     create_num_of_public_articles(10)
     # when: user is executing GET method
-    url = reverse('public')
+    url = reverse('articles')
     response = client.get(url)
     print(response.content.decode('utf-8'))
     # then: expecting to get 200 and all articles
@@ -30,7 +30,7 @@ def test_get_detail_public_article_as_anon(
     # given: anon user and public article
     article = create_public_article
     # when: anon user goes for detail of the public article
-    url = reverse('public_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.get(url)
     print(response.content.decode('utf-8'))
     # then: expecting to get 200 and info on article
@@ -54,7 +54,7 @@ def test_get_list_private_articles_by_subscriber(
     client = basic_api_client_pass_user(subscriber)
     create_num_of_private_articles(10)
     # when: client accesses the private articles
-    url = reverse('private')
+    url = reverse('articles')
     response = client.get(url)
     print(response.content.decode('utf-8'))
     # then: expecting to get 200 and all info
@@ -72,7 +72,7 @@ def test_get_private_article_by_subscriber(
     client = basic_api_client_pass_user(subscriber)
     article = create_private_article
     # when: client accesses the private articles
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.get(url)
     print(response.content.decode('utf-8'))
     # then: expecting to get 200 and all info
@@ -81,7 +81,8 @@ def test_get_private_article_by_subscriber(
     assert response.data['title'] == article.title
     assert response.data['description'] == article.description
     assert response.data['content'] == article.content
-    assert response.data['author'] == article.author.id
+    assert response.data['author']['first_name'] == article.author.first_name
+    assert response.data['author']['last_name'] == article.author.last_name
     assert response.data['visibility'] == article.visibility
 
 
@@ -93,28 +94,28 @@ def test_get_list_private_articles_by_anon(
     # given: anon client num of private articles
     create_num_of_private_articles(10)
     # when: client accesses the private articles
-    url = reverse('private')
+    url = reverse('articles')
     response = client.get(url)
     print(response.content.decode('utf-8'))
-    # then: expecting to get 401 and detail
-    assert response.status_code == 401
-    assert response.data['detail'] == 'Authentication credentials were not provided.'
+    # then: expecting to get 200
+    assert response.status_code == 200
+    assert response.data == []
 
 
 @pytest.mark.django_db
-def test_get_private_article_by_subscriber(
+def test_get_private_article_by_anon(
     client,
     create_private_article
 ):
     # given: anon client and private article
     article = create_private_article
     # when: client accesses the private articles
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.get(url)
     print(response.content.decode('utf-8'))
     # then: expecting to get 401 and detail
-    assert response.status_code == 401
-    assert response.data['detail'] == 'Authentication credentials were not provided.'
+    assert response.status_code == 403
+    assert response.data['detail'] == 'You are not allowed to access this article.'
 
 
 @pytest.mark.django_db
@@ -131,7 +132,7 @@ def test_post_public_article_as_author(
         'content': 'test content',
     }
     # when: attemting to post article
-    url = reverse('private')
+    url = reverse('articles')
     response = client.post(
         url,
         data=json.dumps(payload),
@@ -161,7 +162,7 @@ def test_post_private_article_as_author(
         'visibility': 'PRIVATE'
     }
     # when: attemting to post article
-    url = reverse('private')
+    url = reverse('articles')
     response = client.post(
         url,
         data=json.dumps(payload),
@@ -190,7 +191,7 @@ def test_post_public_article_as_subscriber(
         'content': 'test content',
     }
     # when: attemting to post article
-    url = reverse('private')
+    url = reverse('articles')
     response = client.post(
         url,
         data=json.dumps(payload),
@@ -217,7 +218,7 @@ def test_post_private_article_as_subscriber(
         'visibility': 'PRIVATE'
     }
     # when: attemting to post article
-    url = reverse('private')
+    url = reverse('articles')
     response = client.post(
         url,
         data=json.dumps(payload),
@@ -246,7 +247,7 @@ def test_put_public_article_as_author(
         'visibility': 'PUBLIC'
     }
     # when: author is updateing the article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.put(
         url,
         data=json.dumps(payload),
@@ -280,7 +281,7 @@ def test_put_public_article_as_non_author(
         'visibility': 'PUBLIC'
     }
     # when: author2 is attempting to update the article of author1
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.put(
         url,
         data=json.dumps(payload),
@@ -307,7 +308,7 @@ def test_patch_public_article_as_author(
         'description': 'updated description',
     }
     # when: author is updateing the article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.patch(
         url,
         data=json.dumps(payload),
@@ -337,7 +338,7 @@ def test_patch_public_article_as_non_author(
         'description': 'updated description',
     }
     # when: author is updateing the article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.patch(
         url,
         data=json.dumps(payload),
@@ -360,7 +361,7 @@ def test_delete_public_article_as_author(
     client = basic_api_client_pass_user(author)
     article = create_public_article_pass_author(author)
     # when: author deletes article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
     print(response.content.decode('utf-8'))
     # then: expects to get 204 code
@@ -380,7 +381,7 @@ def test_delete_public_article_as_non_author(
     author2 = create_user_with_role(role=User.AUTHOR)
     client = basic_api_client_pass_user(author2)
     # when: author deletes article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
     print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail
@@ -405,7 +406,7 @@ def test_put_private_article_as_author(
         'visibility': 'PRIVATE'
     }
     # when: author is updateing the article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.put(
         url,
         data=json.dumps(payload),
@@ -439,7 +440,7 @@ def test_put_private_article_as_non_author(
         'visibility': 'PRIVATE'
     }
     # when: author2 is attempting to update the article of author1
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.put(
         url,
         data=json.dumps(payload),
@@ -466,7 +467,7 @@ def test_patch_private_article_as_author(
         'description': 'updated description',
     }
     # when: author is updateing the article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.patch(
         url,
         data=json.dumps(payload),
@@ -496,7 +497,7 @@ def test_patch_private_article_as_non_author(
         'description': 'updated description',
     }
     # when: author is updateing the article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.patch(
         url,
         data=json.dumps(payload),
@@ -519,7 +520,7 @@ def test_delete_private_article_as_author(
     client = basic_api_client_pass_user(author)
     article = create_private_article_pass_author(author)
     # when: author deletes article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
     print(response.content.decode('utf-8'))
     # then: expects to get 204 code
@@ -539,7 +540,7 @@ def test_delete_private_article_as_non_author(
     author2 = create_user_with_role(role=User.AUTHOR)
     client = basic_api_client_pass_user(author2)
     # when: author deletes article
-    url = reverse('private_detail', args=[article.id])
+    url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
     print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail

@@ -1,11 +1,9 @@
 from django.urls import path
 
-from articles.views import PrivateDetailView, PrivateListCreateView, PublicDetailView, PublicListView
+from articles.views import ArticleListCreateView, ArticleDetailView
 
 
 urlpatterns = [
-    path('public', PublicListView.as_view(), name='public'),
-    path('public/<int:pk>', PublicDetailView.as_view(), name='public_detail'),
-    path('private', PrivateListCreateView.as_view(), name='private'),
-    path('private/<int:pk>', PrivateDetailView.as_view(), name='private_detail'),
+    path('', ArticleListCreateView.as_view(), name='articles'),
+    path('<int:pk>', ArticleDetailView.as_view(), name='articles_detail'),
 ]

@@ -13,30 +13,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         ]
 
 
-class PublicArticleListSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(read_only=True)
-    class Meta:
-        model = Article
-        fields = [
-            'id',
-            'title',
-            'description',
-            'author'
-        ]
-
-class PublicArticleDetailSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(read_only=True)
-    class Meta:
-        model = Article
-        fields = [
-            'id',
-            'title',
-            'description',
-            'content',
-            'author'
-        ]
-
-class PrivateArticleListSerializer(serializers.ModelSerializer):
+class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = [
@@ -46,15 +23,9 @@ class PrivateArticleListSerializer(serializers.ModelSerializer):
             'description',
             'author'
         ]
-    
-    def create(self, validated_data):
-        new_article = Article.objects.create(
-            **validated_data,
-            author=self.context["request"].user,
-        )
-        return new_article
 
-class PrivateArticleDetailSerializer(serializers.ModelSerializer):
+
+class ArticleDetailSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     class Meta:
         model = Article
