@@ -2,6 +2,7 @@
 *.pot
 *.pyc
 test_content.json
+test_content.txt
 *.bkp
 # Byte-compiled / optimized / DLL files
 __pycache__/

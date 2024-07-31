@@ -7,6 +7,8 @@ User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+
     class Meta:
         model = User
         fields = [
@@ -18,13 +20,49 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
+        email = attrs['email']
+        existing_email = User.objects.filter(email=email).first()
+        if existing_email: # checking for uniqueness
+            raise serializers.ValidationError(
+                {
+                    'detail': 'Email or password fields are incorrect.',
+                    'message': ('Password must be at least 8 characters long, '
+                              'contain at least one uppercase and one lowercase letter.')
+                }
+            )
+        if not re.search(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+            raise serializers.ValidationError(
+                {
+                    'detail': 'Email or password fields are incorrect.',
+                    'message': ('Password must be at least 8 characters long, '
+                              'contain at least one uppercase and one lowercase letter.')
+                }
+            )
         password = attrs['password']
         if not re.search(r'[A-Z]', password):
-            raise serializers.ValidationError({'password': 'Password must contain at least one uppercase letter.'})
+            raise serializers.ValidationError(
+                {
+                    'detail': 'Email or password fields are incorrect.',
+                    'message': ('Password must be at least 8 characters long, '
+                              'contain at least one uppercase and one lowercase letter.')
+                }
+            )
         if not re.search(r'[a-z]', password):
-            raise serializers.ValidationError({'password': 'Password must contain at least one lowercase letter.'})
+            raise serializers.ValidationError(
+                {
+                    'detail': 'Email or password fields are incorrect.',
+                    'message': ('Password must be at least 8 characters long, '
+                              'contain at least one uppercase and one lowercase letter.')
+                }
+            )
         if len(password) < 8:
-            raise serializers.ValidationError({'password': 'Password must be at least 8 characters long.'})
+            raise serializers.ValidationError(
+                {
+                    'detail': 'Email or password fields are incorrect.',
+                    'message': ('Password must be at least 8 characters long, '
+                              'contain at least one uppercase and one lowercase letter.')
+                }
+            )
         return attrs        
     
     def create(self, validated_data):

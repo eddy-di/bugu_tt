@@ -26,7 +26,7 @@ class PublicDetailView(RetrieveAPIView):
 
 class PrivateListCreateView(ListCreateAPIView):
     queryset = Article.objects.filter(visibility=Article.PRIVATE).all()
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -39,17 +39,24 @@ class PrivateListCreateView(ListCreateAPIView):
                 {'detail': 'You are not allowed to perform this action.'},
                 code=status.HTTP_403_FORBIDDEN
             )
-        return super().post(request, *args, **kwargs)
+        result = super().post(request, *args, **kwargs)
+        request.data['author'] = request.user
+        return result
     
 
 class PrivateDetailView(RetrieveUpdateDestroyAPIView):
-    queryset = Article.objects.filter(visibility=Article.PRIVATE)
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Article.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = PrivateArticleDetailSerializer
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        if request.user.role != User.AUTHOR and instance.author != request.user:
+        if request.user.role != User.AUTHOR:
+            raise PermissionDenied(
+                {'detail': 'You are not allowed to perform this action.'},
+                code=status.HTTP_403_FORBIDDEN
+            )
+        if instance.author != request.user:
             raise PermissionDenied(
                 {'detail': 'You are not allowed to perform this action.'},
                 code=status.HTTP_403_FORBIDDEN
@@ -59,7 +66,12 @@ class PrivateDetailView(RetrieveUpdateDestroyAPIView):
     
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
-        if request.user.role != User.AUTHOR and instance.author != request.user:
+        if request.user.role != User.AUTHOR:
+            raise PermissionDenied(
+                {'detail': 'You are not allowed to perform this action.'},
+                code=status.HTTP_403_FORBIDDEN
+            )
+        if instance.author != request.user:
             raise PermissionDenied(
                 {'detail': 'You are not allowed to perform this action.'},
                 code=status.HTTP_403_FORBIDDEN
