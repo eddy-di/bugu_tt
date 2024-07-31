@@ -4,11 +4,10 @@ from django.contrib.auth import login, logout
 from drf_spectacular.utils import extend_schema
 
 from accounts.models import User
-from accounts.serializers import LoginSerializer, LogoutSerializer, RegisterSerializer
+from accounts.serializers import LoginSerializer, LogoutSerializer, RegisterAuthorSerializer, RegisterSerializer
 
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
@@ -23,6 +22,21 @@ class RegisterView(generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
     
+
+class RegisterAuthorView(generics.CreateAPIView):
+    serializer_class = RegisterAuthorSerializer
+    
+    def post(self, request, *args, **kwargs):
+        serializer = RegisterAuthorSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(
+            {
+                "user": RegisterSerializer(user).data,
+                "message": "Author registered successfully."
+            }, 
+            status=status.HTTP_201_CREATED
+        )
 
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer

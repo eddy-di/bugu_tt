@@ -58,6 +58,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
     
 
+class RegisterAuthorSerializer(RegisterSerializer):
+
+    def create(self, validated_data):
+        user = super().create(validated_data)
+        user.role = 'AUTHOR'
+        user.save()
+        return user
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
