@@ -17,9 +17,9 @@ def test_get_list_public_articles_as_anon(
     # when: user is executing GET method
     url = reverse('articles')
     response = client.get(url)
-    print(response.content.decode('utf-8'))
     # then: expecting to get 200 and all articles
     assert response.status_code == 200
+    assert len(response.data) == 10
 
 
 @ pytest.mark.django_db
@@ -32,7 +32,6 @@ def test_get_detail_public_article_as_anon(
     # when: anon user goes for detail of the public article
     url = reverse('articles_detail', args=[article.id])
     response = client.get(url)
-    print(response.content.decode('utf-8'))
     # then: expecting to get 200 and info on article
     assert response.status_code == 200
     assert response.data['id'] == article.id
@@ -56,7 +55,6 @@ def test_get_list_private_articles_by_subscriber(
     # when: client accesses the private articles
     url = reverse('articles')
     response = client.get(url)
-    print(response.content.decode('utf-8'))
     # then: expecting to get 200 and all info
     assert response.status_code == 200
 
@@ -74,7 +72,6 @@ def test_get_private_article_by_subscriber(
     # when: client accesses the private articles
     url = reverse('articles_detail', args=[article.id])
     response = client.get(url)
-    print(response.content.decode('utf-8'))
     # then: expecting to get 200 and all info
     assert response.status_code == 200
     assert response.data['id'] == article.id
@@ -96,7 +93,6 @@ def test_get_list_private_articles_by_anon(
     # when: client accesses the private articles
     url = reverse('articles')
     response = client.get(url)
-    print(response.content.decode('utf-8'))
     # then: expecting to get 200
     assert response.status_code == 200
     assert response.data == []
@@ -112,7 +108,6 @@ def test_get_private_article_by_anon(
     # when: client accesses the private articles
     url = reverse('articles_detail', args=[article.id])
     response = client.get(url)
-    print(response.content.decode('utf-8'))
     # then: expecting to get 401 and detail
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to access this article.'
@@ -138,7 +133,6 @@ def test_post_public_article_as_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 201
     assert response.status_code == 201
     assert response.data['title'] == payload['title']
@@ -168,7 +162,6 @@ def test_post_private_article_as_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 201
     assert response.status_code == 201
     assert response.data['title'] == payload['title']
@@ -197,7 +190,6 @@ def test_post_public_article_as_subscriber(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 403
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'
@@ -224,7 +216,6 @@ def test_post_private_article_as_subscriber(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 403
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'
@@ -253,7 +244,6 @@ def test_put_public_article_as_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 200 and updated values
     assert response.status_code == 200
     assert response.data['visibility'] == Article.PUBLIC
@@ -287,7 +277,6 @@ def test_put_public_article_as_non_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'
@@ -314,7 +303,6 @@ def test_patch_public_article_as_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 200 and updated values
     assert response.status_code == 200
     assert response.data['title'] == payload['title']
@@ -344,7 +332,6 @@ def test_patch_public_article_as_non_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'
@@ -363,7 +350,6 @@ def test_delete_public_article_as_author(
     # when: author deletes article
     url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
-    print(response.content.decode('utf-8'))
     # then: expects to get 204 code
     assert response.status_code == 204
 
@@ -383,7 +369,6 @@ def test_delete_public_article_as_non_author(
     # when: author deletes article
     url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
-    print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'
@@ -412,7 +397,6 @@ def test_put_private_article_as_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 200 and updated values
     assert response.status_code == 200
     assert response.data['visibility'] == Article.PRIVATE
@@ -446,7 +430,6 @@ def test_put_private_article_as_non_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'
@@ -473,7 +456,6 @@ def test_patch_private_article_as_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 200 and updated values
     assert response.status_code == 200
     assert response.data['title'] == payload['title']
@@ -503,7 +485,6 @@ def test_patch_private_article_as_non_author(
         data=json.dumps(payload),
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'
@@ -522,7 +503,6 @@ def test_delete_private_article_as_author(
     # when: author deletes article
     url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
-    print(response.content.decode('utf-8'))
     # then: expects to get 204 code
     assert response.status_code == 204
 
@@ -542,7 +522,6 @@ def test_delete_private_article_as_non_author(
     # when: author deletes article
     url = reverse('articles_detail', args=[article.id])
     response = client.delete(url)
-    print(response.content.decode('utf-8'))
     # then: expect to get 403 and detail
     assert response.status_code == 403
     assert response.data['detail'] == 'You are not allowed to perform this action.'

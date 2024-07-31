@@ -21,7 +21,6 @@ def test_register_endpoint_with_correct_email(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 201 code
     assert response.status_code == 201
     assert response.data['user']['email'] == payload['email']
@@ -44,7 +43,6 @@ def test_register_endpoint_with_incorrect_email(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 400 code
     assert response.status_code == 400
     assert response.data['detail'] == ['Email or password fields are incorrect.']
@@ -68,7 +66,6 @@ def test_register_endpoint_with_incorrect_password_all_lowercase(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 400 code
     assert response.status_code == 400
     assert response.data['detail'] == ['Email or password fields are incorrect.']
@@ -92,7 +89,6 @@ def test_register_endpoint_with_incorrect_password_all_uppercase(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 400 code
     assert response.status_code == 400
     assert response.data['detail'] == ['Email or password fields are incorrect.']
@@ -116,7 +112,6 @@ def test_register_endpoint_with_incorrect_password_bad_length(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 400 code
     assert response.status_code == 400
     assert response.data['detail'] == ['Email or password fields are incorrect.']
@@ -142,7 +137,6 @@ def test_register_endpoint_with_existing_email_and_password(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting to get 400 code
     assert response.status_code == 400
     assert response.data['detail'] == ['Email or password fields are incorrect.']
@@ -168,7 +162,6 @@ def test_login_endpoint_with_correct_data(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting success and 200 status code
     assert response.status_code == 200
     assert response.data['user']['email'] == payload['email']
@@ -193,7 +186,6 @@ def test_login_endpoint_with_incorrect_data(
         data=payload,
         content_type='application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expexting to get error
     assert response.status_code == 400
     assert response.data['non_field_errors'] == ['Invalid login credentials']
@@ -214,7 +206,6 @@ def test_logout_enpoint(
         data=None,
         content_type = 'application/json'
     )
-    print(response.content.decode('utf-8'))
     # then: expecting success and status code 200
     assert response.status_code == 200
     assert response.data['message'] == 'Logged out successfully.'

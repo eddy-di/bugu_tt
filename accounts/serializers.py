@@ -39,23 +39,7 @@ class RegisterSerializer(serializers.ModelSerializer):
                 }
             )
         password = attrs['password']
-        if not re.search(r'[A-Z]', password):
-            raise serializers.ValidationError(
-                {
-                    'detail': 'Email or password fields are incorrect.',
-                    'message': ('Password must be at least 8 characters long, '
-                              'contain at least one uppercase and one lowercase letter.')
-                }
-            )
-        if not re.search(r'[a-z]', password):
-            raise serializers.ValidationError(
-                {
-                    'detail': 'Email or password fields are incorrect.',
-                    'message': ('Password must be at least 8 characters long, '
-                              'contain at least one uppercase and one lowercase letter.')
-                }
-            )
-        if len(password) < 8:
+        if (not re.search(r'[A-Z]', password) or not re.search(r'[a-z]', password)) or len(password) < 8:
             raise serializers.ValidationError(
                 {
                     'detail': 'Email or password fields are incorrect.',
