@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-n_h-bzu3vn$inoh0%r3_x4l0*-8d73ieboiiye!ui7dqm=x-8o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['bugu-tt.onrender.com']
 
 
 # Application definition
